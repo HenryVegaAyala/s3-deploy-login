@@ -12,6 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     strategy:
       matrix:
         node-version: [ 22.10.0 ]
@@ -39,6 +43,26 @@ jobs:
 
       - name: Build code
         run: pnpm build
+
+      - name: Validate AWS Secrets
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            echo "Error: AWS_ACCESS_KEY_ID secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "Error: AWS_SECRET_ACCESS_KEY secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.S3_BUCKET }}" ]; then
+            echo "Error: S3_BUCKET secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ]; then
+            echo "Error: CLOUDFRONT_DISTRIBUTION_ID secret is not set"
+            exit 1
+          fi
+          echo "All required secrets are configured"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
