@@ -73,8 +73,9 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 rm s3://${{ secrets.S3_BUCKET }} --recursive
-          aws s3 cp ./dist s3://${{ secrets.S3_BUCKET }} --recursive
+          echo "Deploying to bucket: ${{ secrets.S3_BUCKET }}"
+          aws s3 rm ${{ secrets.S3_BUCKET }} --recursive
+          aws s3 cp ./dist ${{ secrets.S3_BUCKET }} --recursive
 
       - name: Invalidate CloudFront Cache
         run: |
